@@ -10,7 +10,7 @@ $dotenv = new Dotenv\Dotenv(dirname(__DIR__));
 $dotenv->load();
 
 $client = new \App\Db\DynamoDBClient(new \Aws\DynamoDb\DynamoDbClient([
-    'version' => 'latest',
+    'version' => getenv('AWS_SDK_VERSION'),
     'profile' => getenv('AWS_PROFILE'),
     'region' => getenv('AWS_DYNAMODB_REGION')
 ]));
