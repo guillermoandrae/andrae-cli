@@ -6,6 +6,5 @@ class TransformerFactory
 {
     public static function factory($name): TransformerInterface
     {
-
     }
 }
