@@ -1,0 +1,6 @@
+{
+  "id": {"S": "111111"},
+  "username": {"S": "foo"},
+  "password": {"S": "bar"},
+  "createdAt": {"N": "1499656214"}
+}
