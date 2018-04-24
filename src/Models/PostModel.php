@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-class PostModel
+class PostModel extends AbstractModel
 {
 
 }

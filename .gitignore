@@ -1,4 +1,7 @@
 .env
+clover.xml
 /vendor/
 /database/dynamodb/*
 !/database/dynamodb/.gitignore
+/database/sources/*
+!/database/sources/.gitignore

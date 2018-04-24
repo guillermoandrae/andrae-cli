@@ -2,20 +2,15 @@
 
 namespace App\Repositories;
 
-use App\Db\ClientAwareTrait;
-use App\Db\ClientInterface;
+use App\Db\AdapterAwareTrait;
+use App\Db\AdapterInterface;
 
 abstract class AbstractRepository implements RepositoryInterface
 {
-    use ClientAwareTrait;
+    use AdapterAwareTrait;
 
-    public function __construct(ClientInterface $client)
+    final public function __construct(AdapterInterface $adapter)
     {
-        $this->client = $client;
-    }
-
-    public function create(array $data)
-    {
-        // TODO: Implement create() method.
+        $this->adapter = $adapter;
     }
 }

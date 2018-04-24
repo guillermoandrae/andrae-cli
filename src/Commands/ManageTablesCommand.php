@@ -2,10 +2,9 @@
 
 namespace App\Commands;
 
-use Symfony\Component\Console\Helper\Table;
+use App\Commands\Helpers\TableHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ManageTablesCommand extends AbstractCommand
@@ -19,48 +18,66 @@ class ManageTablesCommand extends AbstractCommand
             ->addArgument(
                 'operation',
                 InputArgument::REQUIRED,
-                'The name of the table operation')
+                'The name of the table operation: show, describe, glance'
+            )
             ->addArgument(
                 'table',
                 InputArgument::OPTIONAL,
-                'The name of the table on which you are operating');
+                'The name of the table on which you are operating'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $operation = $input->getArgument('operation');
-        $table = $input->getArgument('table');
-        if ($operation == 'glance') {
-            return $this->glance($input, $output, $table);
+        try {
+            $operation = $input->getArgument('operation');
+            $table = $input->getArgument('table');
+            if ($operation != 'show') {
+                if (is_null($table)) {
+                    throw new \InvalidArgumentException('Please provide a table name');
+                }
+            }
+            if (!method_exists($this, $operation)) {
+                throw new \InvalidArgumentException(
+                    sprintf("'%s' is an invalid operation", $operation)
+                );
+            }
+            return call_user_func_array([$this, $operation], [$output, $table]);
+        } catch (\Exception $ex) {
+            $this->fail($output, $ex->getMessage());
         }
-        return call_user_func_array([$this, $operation], [$output, $table]);
     }
 
     protected function show(OutputInterface $output)
     {
-        $result = $this->getRepository('tables')->show();
+        $result = $this->getAdapter()->listTables();
+        $tables = [];
         foreach ($result as $table) {
-            $output->writeln($table) . PHP_EOL;
+            $tables[] = [$table];
         }
+        TableHelper::render($output, ['Tables'], $tables);
     }
 
     protected function describe(OutputInterface $output, $table)
     {
-        $result = $this->getRepository('tables')->describe($table);
-        $table = new Table($output);
-        $table
-            ->setHeaders($result['headers'])
-            ->setRows($result['rows']);
-        $table->render();
+        $headers = ['Field', 'Type', 'Index'];
+        $result = $this->getAdapter()->describeTable($table);
+        TableHelper::render($output, $headers, $result);
     }
 
-    protected function glance(InputInterface $input, OutputInterface $output, $table)
+    protected function glance(OutputInterface $output, $table)
     {
-        $result = $this->getRepository('tables')->glance($table);
-        $table = new Table($output);
-        $table
-            ->setHeaders($result['headers'])
-            ->setRows($result['rows']);
-        $table->render();
+        $result = $this->getAdapter()->fetchItems($table);
+        $rows = [];
+        foreach ($result as $item) {
+            $rows[] = array_map(function (&$value) {
+                $length = 20;
+                if (strlen($value) > $length) {
+                    $value = substr_replace($value, '...', $length);
+                }
+                return $value;
+            }, $item);
+        }
+        TableHelper::render($output, array_keys($result[0]), $rows);
     }
 }

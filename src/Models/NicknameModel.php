@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-class NicknameModel
+class NicknameModel extends AbstractModel
 {
 
 }

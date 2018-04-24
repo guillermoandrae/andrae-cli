@@ -186,7 +186,7 @@ class Adapter implements AdapterInterface
         return $result['TableNames'];
     }
 
-    public function fetchItems(string $table, array $where = [], int $limit = AdapterInterface::FETCH_DEFAULT_LIMIT): array
+    public function fetchItems(string $table, array $where = [], int $limit = AdapterInterface::FETCH_LIMIT): array
     {
         $items = [];
         $options = ['TableName' => $table, 'Limit' => $limit];

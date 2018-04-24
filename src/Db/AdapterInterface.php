@@ -12,7 +12,7 @@ interface AdapterInterface
      *
      * @const integer
      */
-    const FETCH_DEFAULT_LIMIT = 25;
+    const FETCH_LIMIT = 25;
 
     /**
      * Installs DynamoDB locally.
@@ -99,7 +99,7 @@ interface AdapterInterface
      * @param int $limit  OPTIONAL The limit on the number of records to retrieve.
      * @return array
      */
-    public function fetchItems(string $table, array $where = [], int $limit = AdapterInterface::FETCH_DEFAULT_LIMIT): array;
+    public function fetchItems(string $table, array $where = [], int $limit = AdapterInterface::FETCH_LIMIT): array;
 
     /**
      * Inserts records into the database.
@@ -140,5 +140,4 @@ interface AdapterInterface
      * @return Client
      */
     public function getGuzzleClient(): Client;
-
 }

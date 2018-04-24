@@ -2,7 +2,7 @@
 
 namespace App\Commands;
 
-use App\Transformer\TransformerFactory;
+use App\Transformers\TransformerFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,30 +19,29 @@ class ImportCommand extends AbstractCommand
                 'table',
                 't',
                 InputOption::VALUE_REQUIRED,
-                'The name of the destination table')
+                'The name of the destination table'
+            )
             ->addOption(
                 'source',
                 's',
                 InputOption::VALUE_REQUIRED,
-                'The name of a valid source')
-            ->addOption(
-                'file',
-                'f',
-                InputOption::VALUE_REQUIRED,
-                'The path to the file that contains the data to be imported');
+                'The name of a valid source'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $table = $input->getOption('table');
         $source = $input->getOption('source');
-        $file = $input->getOption('file');
-        $output->writeln('It is working, my friend!');
-        $repository = $this->getRepository($table);
-        $transformer = TransformerFactory::factory($source);
-        $data = $transformer->transform($file);
-        foreach ($data as $datum) {
-            $repository->create($datum);
+        try {
+            $repository = $this->getRepository($table);
+            $transformer = TransformerFactory::factory($source);
+            $data = $transformer->transform();
+            foreach ($data as $datum) {
+                $repository->create($datum);
+            }
+        } catch (\Exception $ex) {
+            $this->fail($output, $ex->getMessage());
         }
     }
 }
